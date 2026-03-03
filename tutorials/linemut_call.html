@@ -1,0 +1,291 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LineMut Call &mdash; LineMut v0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=fa47ad08"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="LineMut Build" href="linemut_build.html" />
+    <link rel="prev" title="Welcome to LineMut’s documentation!" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            LineMut
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LineMut Call</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#check-installation">Check Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line-interface">Command-Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-linemut-call-via-a-bash-script">Running LineMut Call via a Bash Script</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#parameter-notes">Parameter Notes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#runtime-logs">Runtime Logs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#output-directory-structure">Output Directory Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="linemut_build.html">LineMut Build</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">LineMut</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">LineMut Call</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/linemut_call.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linemut-call">
+<h1>LineMut Call<a class="headerlink" href="#linemut-call" title="Link to this heading"></a></h1>
+<section id="check-installation">
+<span id="tutorial"></span><h2>Check Installation<a class="headerlink" href="#check-installation" title="Link to this heading"></a></h2>
+<p>You can verify whether LineMut Call has been successfully installed by running the
+following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>which<span class="w"> </span>linemut_call
+</pre></div>
+</div>
+<p>If LineMut Call is correctly installed, this command should return the full path to
+the <code class="docutils literal notranslate"><span class="pre">linemut_call</span></code> executable.</p>
+<p>After installation, you can inspect the available commands and options using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>linemut_call<span class="w"> </span>--help
+</pre></div>
+</div>
+</section>
+<section id="command-line-interface">
+<h2>Command-Line Interface<a class="headerlink" href="#command-line-interface" title="Link to this heading"></a></h2>
+<p>Below is the full help message provided by <code class="docutils literal notranslate"><span class="pre">linemut_call</span></code>:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Usage:
+    linemut_call [OPTIONS]
+
+
+Description:
+    linemut_call is designed for detecting expressed single-nucleotide variants
+    from single-cell RNA-sequencing or spatial transcriptomics data.
+
+
+Options:
+    --bam, -I:
+        raw BAM file.
+    --ref, -R:
+        The reference genome sequence file in FASTA format.
+    --output, -O:
+        Directory for saving the result.
+    --barcode-celltype-mapping, -m:
+        The CSV file containing cell barcodes and their corresponding cell types.
+
+    --cells-coordinate, -c:
+        (optional) The CSV file containing cell coordinate information. If this
+        parameter is not provided, the default behavior is to use cell type as
+        the unit for mutation detection without CMB partitioning.
+    --known-variants-dir, -v:
+        (optional) A directory of VCF-formatted known variant sites for the species.
+    --k-mer, -k:
+        (optional) The length of k-mer, default: 9.
+    --cell-barcode-tag, -t:
+        (optional) The tag name denoting the cell barcode in the BAM file
+        defaults to &#39;CB&#39;.
+    --python:
+        (optional) The pathname to the Python interpreter you want to use.
+        By default, it uses the first &#39;python3&#39; found in the PATH.
+    --gatk:
+        (optional) The pathname of the GATK executable file. By default,
+        search for &#39;gatk&#39; in the PATH.
+    --samtools:
+        (optional) The pathname of the samtools. By default, search for the
+        &#39;samtools&#39; in the PATH.
+
+    --help, -h:
+        Print this message, exit and return a non-zero exit status.
+</pre></div>
+</div>
+</section>
+<section id="running-linemut-call-via-a-bash-script">
+<h2>Running LineMut Call via a Bash Script<a class="headerlink" href="#running-linemut-call-via-a-bash-script" title="Link to this heading"></a></h2>
+<p>To run LineMut Call, specify all required parameters and optionally include additional
+arguments depending on your analysis needs. It is recommended to write the command
+into a Bash script for reproducibility.</p>
+<p>An example script is shown below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">raw_bam</span><span class="o">=</span><span class="s1">&#39;/path/to/bam&#39;</span>
+<span class="nv">ref</span><span class="o">=</span><span class="s1">&#39;/path/to/genome/fasta&#39;</span>
+<span class="nv">output</span><span class="o">=</span><span class="s1">&#39;/path/to/result/&#39;</span>
+<span class="nv">barcode_celltype_mapping</span><span class="o">=</span><span class="s1">&#39;/path/to/barcode/celltype/map/file&#39;</span>
+<span class="nv">cells_coor</span><span class="o">=</span><span class="s1">&#39;/path/to/cells/coordinate/file&#39;</span>
+<span class="nv">k</span><span class="o">=</span>kmer-length
+
+linemut_call<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-I<span class="w"> </span><span class="nv">$raw_bam</span><span class="w"> </span>-O<span class="w"> </span><span class="nv">$output</span><span class="w"> </span>-m<span class="w"> </span><span class="nv">$barcode_celltype_mapping</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-c<span class="w"> </span><span class="nv">$cells_coor</span><span class="w"> </span>-R<span class="w"> </span><span class="nv">$ref</span><span class="w"> </span>-k<span class="w"> </span><span class="nv">$k</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--python<span class="w"> </span>/path/to/python<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--gatk<span class="w"> </span>/python/to/gatk<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--samtools<span class="w"> </span>/path/to/samtools
+</pre></div>
+</div>
+</section>
+<section id="parameter-notes">
+<h2>Parameter Notes<a class="headerlink" href="#parameter-notes" title="Link to this heading"></a></h2>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">-O</span></code> specifies the output directory.
+<strong>This directory should not be created manually</strong>; LineMut will generate it
+automatically during execution.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-m</span></code> specifies a CSV file mapping cell barcodes to cell types.
+Each line in the file should follow the format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">cell</span> <span class="n">barcode</span><span class="o">&gt;</span><span class="p">,</span><span class="o">&lt;</span><span class="n">cell</span> <span class="nb">type</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">-k</span></code> defines the <em>k</em>-mer length used for partitioning CellMetaBins (CMBs).</p></li>
+</ul>
+</section>
+<section id="runtime-logs">
+<h2>Runtime Logs<a class="headerlink" href="#runtime-logs" title="Link to this heading"></a></h2>
+<p>After launching the script, you should see log messages similar to the following
+printed to the console:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2026-01-08 17:24:05 INFO: [linemut_call] bam=/path/to/bam
+2026-01-08 17:24:05 INFO: [linemut_call] output=/path/to/store/result/files
+2026-01-08 17:24:05 INFO: [linemut_call] barcode-celltype-mapping=/path/to/barcode/celltype/map/file
+2026-01-08 17:24:06 INFO: [linemut_call] cells-coordinate=/path/to/cells/coordinate/file
+2026-01-08 17:24:06 INFO: [linemut_call] ref=/path/to/genome/fasta
+2026-01-08 17:24:06 INFO: [linemut_call] k-mer=kmer-length
+2026-01-08 17:24:06 INFO: [linemut_call] python=/path/to/python
+2026-01-08 17:24:06 INFO: [linemut_call] gatk=/path/to/gatk
+2026-01-08 17:24:06 INFO: [linemut_call] samtools=/path/to/samtools
+2026-01-08 17:24:06 INFO: [linemut_call] Step 1: bam filtering and cell type-based demultiplexing
+...
+2026-01-08 19:24:43 INFO: [linemut_call] Step 8: finished
+</pre></div>
+</div>
+</section>
+<section id="output-directory-structure">
+<h2>Output Directory Structure<a class="headerlink" href="#output-directory-structure" title="Link to this heading"></a></h2>
+<p>After the pipeline completes successfully, the output directory will contain a
+structure similar to the following:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>/path/to/result/
+├── 1.celltype_bams
+│   ├── Celltype_0.bam
+│   ├── Celltype_0.bam.bai
+│   ├── Celltype_1.bam
+│   └── Celltype_1.bam.bai
+├── 2.cellmetabin_result
+│   ├── 27mer_cmbs
+│   └── cmb_bams
+├── 3.freebayes_vcfs
+│   ├── Celltype_0_cmb_0.vcf
+│   ├── Celltype_0_cmb_1.vcf
+│   ├── Celltype_0_cmb_2.vcf
+│   ├── Celltype_1_cmb_0.vcf
+│   ├── Celltype_1_cmb_1.vcf
+│   ├── Celltype_1_cmb_2.vcf
+│   └── Celltype_1_cmb_3.vcf
+├── 4.strelka_vcfs
+│   ├── Celltype_0_cmb_0
+│   ├── Celltype_0_cmb_1
+│   ├── Celltype_0_cmb_2
+│   ├── Celltype_1_cmb_0
+│   ├── Celltype_1_cmb_1
+│   ├── Celltype_1_cmb_2
+│   └── Celltype_1_cmb_3
+├── 5.integrated_vars
+│   ├── trusted
+│   └── untrusted
+├── 6.gatk_result
+│   ├── bqsr
+│   ├── filtered_vcfs
+│   ├── logs
+│   ├── raw_vcfs
+│   └── split_ncigar_bams
+├── 7.categorized_vars
+│   ├── trusted
+│   └── untrusted
+└── 8.h5ad_files
+    ├── sc_depth.h5ad
+    ├── sc_ratio.h5ad
+    ├── unit_depth.h5ad
+    └── unit_ratio.h5ad
+</pre></div>
+</div>
+<p>In the output directory <code class="docutils literal notranslate"><span class="pre">8.h5ad_files</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sc*.h5ad</span></code> files store statistics at the single-cell level.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unit*.h5ad</span></code> files store statistics aggregated by analysis units (for example, CMBs or cell types).</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome to LineMut’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="linemut_build.html" class="btn btn-neutral float-right" title="LineMut Build" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, BGI Research, Beijing.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

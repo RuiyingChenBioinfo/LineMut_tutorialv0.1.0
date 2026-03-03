@@ -1,0 +1,26 @@
+Welcome to LineMut's documentation!
+=========================================
+
+**Release: v0.1.0**
+
+Introduction
+---------------
+
+We introduce **LineMut**, an open-source framework for lineage reconstruction from spatial omics data through a spatially informed aggregation unit, **CellMetaBin (CMB)**. By aggregating spots into well-defined, spatially coherent meta-units, CMB preserves read-level nucleotide evidence while improving SNV detectability and maintaining spatial specificity. LineMut integrates CMB-based SNV recovery (**LineMut Call**) with downstream lineage inference (**LineMut Build**), providing a practical route for *in situ* reconstruction of clonal relationships in diverse plant tissues.
+
+.. figure:: _static/figures/Schematic_of_LineMut_pipeline_for_GitHub.png
+   :width: 100%
+   :alt: LineMut overview
+   :align: center
+
+   Overview of the LineMut pipeline
+
+.. note::
+   This project is under active development.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials:
+
+   tutorials/linemut_call
+   tutorials/linemut_build

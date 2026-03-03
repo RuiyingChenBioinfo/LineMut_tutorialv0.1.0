@@ -1,0 +1,295 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neighbor-joining tree construction &mdash; LineMut v0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fa47ad08"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Visualize CellMetaBins on spatial coordinates" href="Visualize%20CMBs%20on%20spatial%20coordinates.html" />
+    <link rel="prev" title="LineMut Build" href="../linemut_build.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            LineMut
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../linemut_call.html">LineMut Call</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../linemut_build.html">LineMut Build</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Neighbor-joining tree construction</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#perform-pca-on-snv-matrix-to-decide-the-elbow-pc">Perform PCA on SNV matrix to decide the elbow PC</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generate-and-plot-nj-trees">Generate and plot NJ trees</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#jackknife-assessment">Jackknife assessment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Visualize%20CMBs%20on%20spatial%20coordinates.html">Visualize CellMetaBins on spatial coordinates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Cell%20lineage%20inference%20with%20SNV%20and%20gene%20expression%20profiles.html">Cell lineage inference with SNV and gene expression profiles</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">LineMut</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../linemut_build.html">LineMut Build</a></li>
+      <li class="breadcrumb-item active">Neighbor-joining tree construction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/notebooks/Neighbor-joining tree construction.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="neighbor-joining-tree-construction">
+<h1>Neighbor-joining tree construction<a class="headerlink" href="#neighbor-joining-tree-construction" title="Link to this heading"></a></h1>
+<p>In this tutorial, we will use a simulated dataset with 8,191 single cells and 408,860 SNV sites to show the process of neighbor-joining (NJ) tree construction. This testing dataset can be downloaded from <a class="reference external" href="https://pan.baidu.com/s/1bqvwkjMzJ8FqB4R53hmv7A?pwd=bixb">Baidu Netdisk</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scanpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kneed</span><span class="w"> </span><span class="kn">import</span> <span class="n">KneeLocator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kneed</span><span class="w"> </span><span class="kn">import</span> <span class="n">KneeLocator</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/home/path/linemut/src/linemut_build/&quot;</span><span class="p">)))</span> <span class="c1"># The path to LineMut Build scripts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">processData</span><span class="w"> </span><span class="kn">import</span> <span class="n">combine_ratio_depth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">processData</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_snv_by_depth_ratio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">constructNJ</span><span class="w"> </span><span class="kn">import</span> <span class="n">revise_snv_ratio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">constructNJ</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_adata_by_mutation_nnz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">constructNJ</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_pcs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">constructNJ</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_snv_pca_by_group</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">constructNJ</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_and_plot_nj</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Load data</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s2">&quot;Simulation_data1_nnz2.h5ad&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> 
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(8191, 408860)
+</pre></div>
+</div>
+</div>
+</div>
+<section id="perform-pca-on-snv-matrix-to-decide-the-elbow-pc">
+<h2>Perform PCA on SNV matrix to decide the elbow PC<a class="headerlink" href="#perform-pca-on-snv-matrix-to-decide-the-elbow-pc" title="Link to this heading"></a></h2>
+<p>For further analysis, information of PC_1–PC_elbow will be used.
+This process is explained in detail in the LineMut publication.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Perform PCA</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+<span class="n">explained_var</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;pca&#39;</span><span class="p">][</span><span class="s1">&#39;variance_ratio&#39;</span><span class="p">]</span>
+<span class="n">explained_var_cum</span> <span class="o">=</span> <span class="n">explained_var</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+
+<span class="c1"># Detect elbow point</span>
+<span class="n">kl</span> <span class="o">=</span> <span class="n">KneeLocator</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">explained_var</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">explained_var</span><span class="p">,</span> <span class="n">curve</span><span class="o">=</span><span class="s2">&quot;convex&quot;</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s2">&quot;decreasing&quot;</span><span class="p">)</span>
+<span class="n">elbow_PC</span> <span class="o">=</span> <span class="n">kl</span><span class="o">.</span><span class="n">elbow</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">explained_var</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">explained_var</span><span class="p">,</span> <span class="s1">&#39;o-&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Individual explained variance&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">explained_var</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="n">explained_var_cum</span><span class="p">,</span> <span class="s1">&#39;s-&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Cumulative explained variance&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">elbow_PC</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Elbow at PC </span><span class="si">{</span><span class="n">elbow_PC</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Principal Component&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;Explained Variance Ratio&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Scree plot of PCA&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Automatically detected elbow PC number:&quot;</span><span class="p">,</span> <span class="n">elbow_PC</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/836785924fa4bc595ea0118154290735a01a587653beffa21082a5317c926a46.png" src="../../_images/836785924fa4bc595ea0118154290735a01a587653beffa21082a5317c926a46.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Automatically detected elbow PC number: 8
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">## Color cells by generation</span>
+<span class="n">gen_colors</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="s2">&quot;#481F70&quot;</span><span class="p">,</span><span class="mi">2</span><span class="p">:</span><span class="s2">&quot;#443A83&quot;</span><span class="p">,</span><span class="mi">3</span><span class="p">:</span><span class="s2">&quot;#3B528B&quot;</span><span class="p">,</span><span class="mi">4</span><span class="p">:</span><span class="s2">&quot;#31688E&quot;</span><span class="p">,</span><span class="mi">5</span><span class="p">:</span><span class="s2">&quot;#287C8E&quot;</span><span class="p">,</span><span class="mi">6</span><span class="p">:</span><span class="s2">&quot;#21908C&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span><span class="s2">&quot;#20A486&quot;</span><span class="p">,</span>
+              <span class="mi">8</span><span class="p">:</span><span class="s2">&quot;#35B779&quot;</span><span class="p">,</span><span class="mi">9</span><span class="p">:</span><span class="s2">&quot;#5DC863&quot;</span><span class="p">,</span><span class="mi">10</span><span class="p">:</span><span class="s2">&quot;#8FD744&quot;</span><span class="p">,</span><span class="mi">11</span><span class="p">:</span><span class="s2">&quot;#C7E020&quot;</span><span class="p">,</span><span class="mi">12</span><span class="p">:</span><span class="s2">&quot;#FDE725&quot;</span><span class="p">}</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s2">&quot;generation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s2">&quot;generation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+<span class="n">plot_snv_pca_by_group</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">pcx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pcy</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">group_by</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span><span class="p">,</span> <span class="n">group_colors</span><span class="o">=</span><span class="n">gen_colors</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/3883b68e803f46578913ce4e919d9c41d625ba3eb2d18f0c6b0780a7937e5316.png" src="../../_images/3883b68e803f46578913ce4e919d9c41d625ba3eb2d18f0c6b0780a7937e5316.png" />
+</div>
+</div>
+<p>To reduce the running time and secure the clarity of the NJ trees, we subset the dataset to 10 cells per generation (random seed set to 42). This step is included only for this tutorial and is not required for real datasets.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">seed</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+<span class="n">gen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s2">&quot;generation&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">unique_gens</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">gen</span><span class="p">))</span>
+
+<span class="n">keep_idx</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">unique_gens</span><span class="p">:</span>
+    <span class="n">idx_g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">gen</span> <span class="o">==</span> <span class="n">g</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">take</span> <span class="o">=</span> <span class="mi">10</span> <span class="k">if</span> <span class="n">idx_g</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="k">else</span> <span class="n">idx_g</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">keep_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">idx_g</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">take</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+
+<span class="n">keep_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">keep_idx</span><span class="p">)</span>
+<span class="n">keep_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">keep_idx</span><span class="p">)</span>
+
+<span class="n">adata_sub</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="n">keep_idx</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Color NJ tree leaves by group info (group type: 0, 0-0, 0-1, 0-0-0, 0-0-1, 0-1-2, or 0-1-3)</span>
+<span class="n">n_group</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">adata_sub</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s2">&quot;group&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">adata_sub</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s2">&quot;lineage&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;string&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[:</span> <span class="p">(</span><span class="n">n_group</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">))</span>
+<span class="n">group_colors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;0&#39;</span><span class="p">:</span><span class="s2">&quot;#31688E&quot;</span><span class="p">,</span> <span class="s1">&#39;0-0&#39;</span><span class="p">:</span><span class="s2">&quot;#35B779&quot;</span><span class="p">,</span> <span class="s1">&#39;0-1&#39;</span><span class="p">:</span><span class="s2">&quot;#7550a6&quot;</span><span class="p">,</span> <span class="s1">&#39;0-0-0&#39;</span><span class="p">:</span><span class="s2">&quot;#abff03&quot;</span><span class="p">,</span> <span class="s1">&#39;0-0-1&#39;</span><span class="p">:</span><span class="s2">&quot;#3bed82&quot;</span><span class="p">,</span> <span class="s1">&#39;0-1-2&#39;</span><span class="p">:</span><span class="s2">&quot;#f294df&quot;</span><span class="p">,</span> <span class="s1">&#39;0-1-3&#39;</span><span class="p">:</span><span class="s2">&quot;#ed7e98&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="generate-and-plot-nj-trees">
+<h2>Generate and plot NJ trees<a class="headerlink" href="#generate-and-plot-nj-trees" title="Link to this heading"></a></h2>
+<p>NJ trees are generated from the filtered SNV PC matrix (PC_1–PC_elbow), with <code class="docutils literal notranslate"><span class="pre">K_tree</span></code> set to 8 (elbow_PC from previous steps). We also add a non-SNV outgroup as a pseudo-founder cell to root the lineage. Below are three example uses of <code class="docutils literal notranslate"><span class="pre">build_and_plot_nj()</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">build_and_plot_nj</span><span class="p">(</span><span class="n">adata_sub</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">group_colors</span> <span class="o">=</span> <span class="n">group_colors</span><span class="p">,</span> <span class="n">K_tree</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">group_key</span><span class="o">=</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="n">show_leaf_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/4ed2cfe7b9e162179ab037a3c7e4f2e822d84a6e1889f86634fc904a2bca9c7d.png" src="../../_images/4ed2cfe7b9e162179ab037a3c7e4f2e822d84a6e1889f86634fc904a2bca9c7d.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">build_and_plot_nj</span><span class="p">(</span><span class="n">adata_sub</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">group_colors</span> <span class="o">=</span> <span class="n">group_colors</span><span class="p">,</span> <span class="n">K_tree</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">group_key</span><span class="o">=</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="n">show_leaf_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">show_legend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/ad465bc94fae4b58fdbe19d9a16dbf80cf02ef9ee9707d668a4eef2e0e290edf.png" src="../../_images/ad465bc94fae4b58fdbe19d9a16dbf80cf02ef9ee9707d668a4eef2e0e290edf.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">build_and_plot_nj</span><span class="p">(</span><span class="n">adata_sub</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">group_colors</span> <span class="o">=</span> <span class="n">group_colors</span><span class="p">,</span> <span class="n">K_tree</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">group_key</span><span class="o">=</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="n">show_leaf_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">leafcolor_onside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/cad0cd5971369a84d78546ee162ef18b01ca63e72ad0d7e624fd27d69803d848.png" src="../../_images/cad0cd5971369a84d78546ee162ef18b01ca63e72ad0d7e624fd27d69803d848.png" />
+</div>
+</div>
+</section>
+<section id="jackknife-assessment">
+<h2>Jackknife assessment<a class="headerlink" href="#jackknife-assessment" title="Link to this heading"></a></h2>
+<p>For jackknife assessment of NJ tree stability, we here demonstrate an example of using expanded feature set of the first 15 principal components (<code class="docutils literal notranslate"><span class="pre">jackknife</span></code> set to True, <code class="docutils literal notranslate"><span class="pre">K_jackknife</span></code> set to 15) and generated K_jackknife jackknife replicates by excluding one principal component at a time, recomputing the distance matrix with the same metric, and reconstructing the NJ tree. Only Jackknife support scores no less than 50 (<code class="docutils literal notranslate"><span class="pre">jackknife_min_support</span></code> set to 50) are shown on the NJ tree.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tree</span> <span class="o">=</span> <span class="n">build_and_plot_nj</span><span class="p">(</span><span class="n">adata_sub</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">group_colors</span> <span class="o">=</span> <span class="n">group_colors</span><span class="p">,</span> <span class="n">K_tree</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">jackknife</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">K_jackknife</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">jackknife_min_support</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">group_key</span><span class="o">=</span><span class="s2">&quot;group&quot;</span><span class="p">,</span> <span class="n">show_leaf_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">leafcolor_onside</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/5ec11f8eaeaec967248f4d656a780619045e2761e3d7ddfc5e2baf98a1545dfd.png" src="../../_images/5ec11f8eaeaec967248f4d656a780619045e2761e3d7ddfc5e2baf98a1545dfd.png" />
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../linemut_build.html" class="btn btn-neutral float-left" title="LineMut Build" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Visualize%20CMBs%20on%20spatial%20coordinates.html" class="btn btn-neutral float-right" title="Visualize CellMetaBins on spatial coordinates" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, BGI Research, Beijing.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

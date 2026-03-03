@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualize CellMetaBins on spatial coordinates &mdash; LineMut v0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css?v=6644e6bb" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=fa47ad08"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Cell lineage inference with SNV and gene expression profiles" href="Cell%20lineage%20inference%20with%20SNV%20and%20gene%20expression%20profiles.html" />
+    <link rel="prev" title="Neighbor-joining tree construction" href="Neighbor-joining%20tree%20construction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            LineMut
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../linemut_call.html">LineMut Call</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../linemut_build.html">LineMut Build</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Neighbor-joining%20tree%20construction.html">Neighbor-joining tree construction</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Visualize CellMetaBins on spatial coordinates</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#perform-visualization">Perform visualization<br></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot-distribution-of-the-cmbs-on-spatial-coordinates">Plot distribution of the CMBs on spatial coordinates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#plot-colors-of-the-cmbs-on-obs-columns-of-the-adata">Plot colors of the CMBs on obs columns of the adata</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Cell%20lineage%20inference%20with%20SNV%20and%20gene%20expression%20profiles.html">Cell lineage inference with SNV and gene expression profiles</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">LineMut</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../linemut_build.html">LineMut Build</a></li>
+      <li class="breadcrumb-item active">Visualize CellMetaBins on spatial coordinates</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/notebooks/Visualize CMBs on spatial coordinates.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="visualize-cellmetabins-on-spatial-coordinates">
+<h1>Visualize CellMetaBins on spatial coordinates<a class="headerlink" href="#visualize-cellmetabins-on-spatial-coordinates" title="Link to this heading"></a></h1>
+<p>In this tutorial, we will use a real dataset from Song <em>et al</em>. (PNAS, 2023) to show the visualization of CellMetaBins (CMBs) on spatial coordinates. This processed dataset can be downloaded from <a class="reference external" href="https://pan.baidu.com/s/1WWBJ6xeZpmHWygh21mQLmw?pwd=jarq">Baidu Netdisk</a>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scanpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnnData</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">kneed</span><span class="w"> </span><span class="kn">import</span> <span class="n">KneeLocator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+    
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/home/path/linemut/src/linemut_build/&quot;</span><span class="p">)))</span> <span class="c1"># The path to LineMut Build scripts</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">processData</span><span class="w"> </span><span class="kn">import</span> <span class="n">combine_ratio_depth</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plotCMBs</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_cmb_cent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">plotCMBs</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_obs_with_cmb_cent</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><strong>Three files are needed to visualize SNV:</strong><br></p>
+<p><strong>adatas:</strong> Ratio and depth information of CMB * SNV in h5ad files<br>
+<strong>coor:</strong> Original cell coordinate file with 3 columns (cell, x, y) and no header<br>
+<strong>cmb_info:</strong> Cell CMB group annotation with 2 columns (cell, group) and no header</p>
+<p>Load and combine data</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ad_ratio</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s2">&quot;Dataset1/unit_ratio.h5ad&quot;</span><span class="p">)</span>
+<span class="n">ad_depth</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s2">&quot;Dataset1/unit_depth.h5ad&quot;</span><span class="p">)</span>
+<span class="n">adata</span> <span class="o">=</span> <span class="n">combine_ratio_depth</span><span class="p">(</span><span class="n">ad_ratio</span><span class="p">,</span> <span class="n">ad_depth</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Load spot coordinates and respective CMB labels</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coor1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;Dataset1/cells_coor.csv&#39;</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">cmb_info1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;Dataset1/cellmetabin.csv&#39;</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cell&#39;</span><span class="p">,</span> <span class="s1">&#39;group&#39;</span><span class="p">],</span> <span class="n">index_col</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">coor1</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">coor1</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;coerce&#39;</span><span class="p">)</span>
+<span class="n">df1</span> <span class="o">=</span> <span class="n">coor1</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmb_info1</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;inner&#39;</span><span class="p">)</span>
+<span class="n">cmb_agg1</span> <span class="o">=</span> <span class="n">df1</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span><span class="n">x_center</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;median&#39;</span><span class="p">),</span> <span class="n">y_center</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">,</span><span class="s1">&#39;median&#39;</span><span class="p">),</span> <span class="n">n_cells</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;size&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Add aggregated coordinate informtaion to adata</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmb_agg1</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">)[[</span><span class="s1">&#39;x_center&#39;</span><span class="p">,</span><span class="s1">&#39;y_center&#39;</span><span class="p">,</span><span class="s1">&#39;n_cells&#39;</span><span class="p">]],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="perform-visualization">
+<h2>Perform visualization<br><a class="headerlink" href="#perform-visualization" title="Link to this heading"></a></h2>
+<p><strong>Cell colors can be adjusted with parameter “group_colors” in four ways:<br></strong>
+(1) Pass a dictionary (specify colors by group name): e.g. group_colors = {‘A’: ‘red’, ‘B’: ‘green’}<br>
+(2) Pass a sequence of colors (assigned in order of appearance, looping if not already present): e.g. group_colors = [‘red’, ‘green’, ‘orange’]<br>
+(3) Pass a Matplotlib colormap name: e.g. group_colors = ‘viridis’<br>
+(4) If not passed, ‘tab20’ is used by default</p>
+</section>
+<section id="plot-distribution-of-the-cmbs-on-spatial-coordinates">
+<h2>Plot distribution of the CMBs on spatial coordinates<a class="headerlink" href="#plot-distribution-of-the-cmbs-on-spatial-coordinates" title="Link to this heading"></a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_cmb_cent</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">coor1</span><span class="p">,</span> <span class="n">cmb_info1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Looks like you are using a tranform that doesn&#39;t support FancyArrowPatch, using ax.annotate instead. The arrows might strike through texts. Increasing shrinkA in arrowprops might help.
+</pre></div>
+</div>
+<img alt="../../_images/49b7fa76f11a05d5057673bdf33c6faa5c5ebfa9eb161ae27acf8f3cb157efb5.png" src="../../_images/49b7fa76f11a05d5057673bdf33c6faa5c5ebfa9eb161ae27acf8f3cb157efb5.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 800x600 with 1 Axes&gt;,
+ &lt;Axes: title={&#39;center&#39;: &#39;CMB distribution on spatial coordinates&#39;}, xlabel=&#39;Spatial X&#39;, ylabel=&#39;Spatial Y&#39;&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Use manually selected colors for CMBs</span>
+<span class="n">group_colors_cmb1</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Inner_callus_cmb_0&quot;</span><span class="p">:</span><span class="s2">&quot;#B850B1&quot;</span><span class="p">,</span> <span class="s2">&quot;Inner_callus_cmb_1&quot;</span><span class="p">:</span><span class="s2">&quot;#CD6698&quot;</span><span class="p">,</span> <span class="s2">&quot;Inner_callus_cmb_2&quot;</span><span class="p">:</span><span class="s2">&quot;#E27C80&quot;</span><span class="p">,</span> <span class="s2">&quot;Inner_callus_cmb_3&quot;</span><span class="p">:</span><span class="s2">&quot;#D16144&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;Outgrowth_shoot_cmb_0&quot;</span><span class="p">:</span><span class="s2">&quot;#357B6E&quot;</span><span class="p">,</span> <span class="s2">&quot;Outgrowth_shoot_cmb_1&quot;</span><span class="p">:</span><span class="s2">&quot;#469B80&quot;</span><span class="p">,</span> <span class="s2">&quot;Outgrowth_shoot_cmb_2&quot;</span><span class="p">:</span><span class="s2">&quot;#68B78B&quot;</span><span class="p">,</span> <span class="s2">&quot;Outgrowth_shoot_cmb_3&quot;</span><span class="p">:</span><span class="s2">&quot;#9ACE8F&quot;</span><span class="p">,</span> <span class="s2">&quot;Outgrowth_shoot_cmb_4&quot;</span><span class="p">:</span><span class="s2">&quot;#357B3B&quot;</span><span class="p">,</span> 
+                     <span class="s2">&quot;Vascular_tissue_cmb_0&quot;</span><span class="p">:</span><span class="s2">&quot;#FFDBB0&quot;</span><span class="p">,</span> <span class="s2">&quot;Vascular_tissue_cmb_1&quot;</span><span class="p">:</span><span class="s2">&quot;#f0bd78&quot;</span><span class="p">,</span> <span class="s2">&quot;Vascular_tissue_cmb_2&quot;</span><span class="p">:</span><span class="s2">&quot;#F5CD1E&quot;</span><span class="p">,</span> <span class="s2">&quot;Vascular_tissue_cmb_3&quot;</span><span class="p">:</span><span class="s2">&quot;#F29651&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;Epidermis_cmb_0&quot;</span><span class="p">:</span><span class="s2">&quot;#46466A&quot;</span><span class="p">,</span> <span class="s2">&quot;Epidermis_cmb_1&quot;</span><span class="p">:</span><span class="s2">&quot;#4FA9B2&quot;</span><span class="p">,</span> <span class="s2">&quot;Epidermis_cmb_2&quot;</span><span class="p">:</span><span class="s2">&quot;#5691AC&quot;</span><span class="p">,</span> <span class="s2">&quot;Epidermis_cmb_3&quot;</span><span class="p">:</span><span class="s2">&quot;#84CDD3&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;Shoot_primordia_cmb_0&quot;</span><span class="p">:</span><span class="s2">&quot;#82543A&quot;</span><span class="p">,</span> <span class="s2">&quot;Shoot_primordia_cmb_1&quot;</span><span class="p">:</span><span class="s2">&quot;#A88764&quot;</span><span class="p">,</span> <span class="s2">&quot;Shoot_primordia_cmb_2&quot;</span><span class="p">:</span><span class="s2">&quot;#d1c392&quot;</span><span class="p">,</span> <span class="s2">&quot;Shoot_primordia_cmb_3&quot;</span><span class="p">:</span><span class="s2">&quot;#B7B6B3&quot;</span><span class="p">,</span> <span class="s2">&quot;Shoot_primordia_cmb_4&quot;</span><span class="p">:</span><span class="s2">&quot;#857b5d&quot;</span><span class="p">,</span> <span class="s2">&quot;Shoot_primordia_cmb_5&quot;</span><span class="p">:</span><span class="s2">&quot;#9aa65b&quot;</span><span class="p">}</span>
+<span class="n">plot_cmb_cent</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">coor1</span><span class="p">,</span> <span class="n">cmb_info1</span><span class="p">,</span> <span class="n">group_colors</span> <span class="o">=</span> <span class="n">group_colors_cmb1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/35c264bec6b5f4e16228f3518b3d7f61e2d8b1fe051b1e4b0343ce87a88dc44a.png" src="../../_images/35c264bec6b5f4e16228f3518b3d7f61e2d8b1fe051b1e4b0343ce87a88dc44a.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 800x600 with 1 Axes&gt;,
+ &lt;Axes: title={&#39;center&#39;: &#39;CMB distribution on spatial coordinates&#39;}, xlabel=&#39;Spatial X&#39;, ylabel=&#39;Spatial Y&#39;&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="plot-colors-of-the-cmbs-on-obs-columns-of-the-adata">
+<h2>Plot colors of the CMBs on obs columns of the adata<a class="headerlink" href="#plot-colors-of-the-cmbs-on-obs-columns-of-the-adata" title="Link to this heading"></a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>x_center</th>
+      <th>y_center</th>
+      <th>n_cells</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Outgrowth_shoot_cmb_4</th>
+      <td>24.0</td>
+      <td>65.0</td>
+      <td>51</td>
+    </tr>
+    <tr>
+      <th>Vascular_tissue_cmb_0</th>
+      <td>62.0</td>
+      <td>66.0</td>
+      <td>232</td>
+    </tr>
+    <tr>
+      <th>Shoot_primordia_cmb_2</th>
+      <td>27.5</td>
+      <td>46.5</td>
+      <td>26</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_obs_with_cmb_cent</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">coor1</span><span class="p">,</span> <span class="n">cmb_info1</span><span class="p">,</span> <span class="n">cell_colors_by_obs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">group_by</span> <span class="o">=</span> <span class="s2">&quot;n_cells&quot;</span><span class="p">,</span> <span class="n">group_colors</span><span class="o">=</span><span class="n">group_colors_cmb1</span><span class="p">)</span>
+<span class="n">plot_obs_with_cmb_cent</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">coor1</span><span class="p">,</span> <span class="n">cmb_info1</span><span class="p">,</span> <span class="n">cell_colors_by_obs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">group_by</span> <span class="o">=</span> <span class="s2">&quot;n_cells&quot;</span><span class="p">,</span> <span class="n">group_colors</span><span class="o">=</span><span class="n">group_colors_cmb1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/735cbabbd9c97e6f248b38cb9dbf40edf508f4ec957fcfa438684f87e654a018.png" src="../../_images/735cbabbd9c97e6f248b38cb9dbf40edf508f4ec957fcfa438684f87e654a018.png" />
+<img alt="../../_images/2de4afb14309a9cd38175f887407d933c20c63bbd02faba5076f2d94c579ea34.png" src="../../_images/2de4afb14309a9cd38175f887407d933c20c63bbd02faba5076f2d94c579ea34.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 900x600 with 2 Axes&gt;,
+ &lt;Axes: title={&#39;center&#39;: &#39;Mapping n_cells on spatial coordinates&#39;}, xlabel=&#39;Spatial X&#39;, ylabel=&#39;Spatial Y&#39;&gt;)
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Neighbor-joining%20tree%20construction.html" class="btn btn-neutral float-left" title="Neighbor-joining tree construction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Cell%20lineage%20inference%20with%20SNV%20and%20gene%20expression%20profiles.html" class="btn btn-neutral float-right" title="Cell lineage inference with SNV and gene expression profiles" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, BGI Research, Beijing.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
